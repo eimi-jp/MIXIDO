@@ -1,0 +1,59 @@
+name: Build – Windows
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:   # allow manual trigger from GitHub UI
+
+jobs:
+  build:
+    name: Windows Standalone (x64)
+    runs-on: ubuntu-latest   # GameCI Linux runners build all targets incl. Windows
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history (needed for some Unity packages)
+          lfs: true               # pull any Git LFS assets
+
+      # ── 2. Cache Library folder ───────────────────────────────────────────────
+      # Skipping this on first run is fine; subsequent runs will be much faster.
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Windows-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Windows-
+            Library-
+
+      # ── 3. Build ──────────────────────────────────────────────────────────────
+      - name: Build (StandaloneWindows64)
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE:    ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL:      ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD:   ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion:     6000.0.73f1
+          targetPlatform:   StandaloneWindows64
+          buildName:        TheJungleDarkLand
+          buildsPath:       build
+          # Remove the line below if you don't use a custom build method.
+          # buildMethod:    BuildScript.BuildWindows
+
+      # ── 4. Upload artifact ───────────────────────────────────────────────────
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: TheJungleDarkLand-Windows
+          path: build/StandaloneWindows64
+          retention-days: 14
