@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest   # GameCI Linux runners build all targets incl. Windows
 
     steps:
-      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      # ── 1. Checkout ────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
