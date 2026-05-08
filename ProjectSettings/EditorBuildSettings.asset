@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/IntroGame.unity
+    guid: 86d18701eee2ead48b444315076adb6a
+  - enabled: 1
+    path: Assets/Scenes/InsideHouse.unity
+    guid: ef1f9b3ef895adf4c947223e1425e788
+  - enabled: 1
+    path: Assets/Scenes/TheJungle.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/BossMap.unity
+    guid: 762eca31d6e4a9d4091aebc6548ae12d
+  m_configObjects: {}
