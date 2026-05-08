@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - mainn
+    tags:
+      - "v*"           # triggers release when you push a tag like v1.0.0
   pull_request:
     branches:
       - mainn
@@ -14,15 +16,19 @@ jobs:
     name: Windows Standalone (x64)
     runs-on: ubuntu-latest   # GameCI Linux runners build all targets incl. Windows
 
+    # Needed for softprops/action-gh-release to create releases
+    permissions:
+      contents: write
+
     steps:
-      # ── 1. Checkout ────────────────────────────────────────────────────────
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0          # full history (needed for some Unity packages)
           lfs: true               # pull any Git LFS assets
 
-      # ── 2. Cache Library folder ──────────────────────────────────────────────
+      # ── 2. Cache Library folder ───────────────────────────────────────────────
       # Skipping this on first run is fine; subsequent runs will be much faster.
       - name: Cache Unity Library
         uses: actions/cache@v4
@@ -45,13 +51,30 @@ jobs:
           targetPlatform:   StandaloneWindows64
           buildName:        TheJungleDarkLand
           buildsPath:       build
-          # Remove the line below if you don't use a custom build method.
           # buildMethod:    BuildScript.BuildWindows
 
-      # ── 4. Upload artifact ───────────────────────────────────────────────────
-      - name: Upload Windows build
+      # ── 4. Zip the build ──────────────────────────────────────────────────────
+      - name: Zip build output
+        run: |
+          cd build/StandaloneWindows64
+          zip -r ../../TheJungleDarkLand-Windows.zip .
+
+      # ── 5. Upload artifact (always — for every branch push / PR) ─────────────
+      - name: Upload Windows build artifact
         uses: actions/upload-artifact@v4
         with:
           name: TheJungleDarkLand-Windows
-          path: build/StandaloneWindows64
+          path: TheJungleDarkLand-Windows.zip
           retention-days: 14
+
+      # ── 6. Create GitHub Release (only when a v* tag is pushed) ──────────────
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "The Jungle: Dark Land ${{ github.ref_name }}"
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true   # auto-generates changelog from commits
+          files: TheJungleDarkLand-Windows.zip
