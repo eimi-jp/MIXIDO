@@ -15,14 +15,14 @@ jobs:
     runs-on: ubuntu-latest   # GameCI Linux runners build all targets incl. Windows
 
     steps:
-      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      # ── 1. Checkout ────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0          # full history (needed for some Unity packages)
           lfs: true               # pull any Git LFS assets
 
-      # ── 2. Cache Library folder ───────────────────────────────────────────────
+      # ── 2. Cache Library folder ──────────────────────────────────────────────
       # Skipping this on first run is fine; subsequent runs will be much faster.
       - name: Cache Unity Library
         uses: actions/cache@v4
